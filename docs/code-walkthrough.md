@@ -1,51 +1,4 @@
-# Module 4
-Datastores – Connect to your data to Azure storage services on Azure
-Use the Datastore object in the SDK – To work with a datastore, you must first register it
-Please see Microsoft Docs reference to Connect to data in storage services on Azure - Azure Machine Learning:  https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui
-Also, see Azure ML reference on Datastore class:
-https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py
-from azureml.core import Workspace, Datastore
-ws = Workspace.from_config()
-# Register a new datastore
-blob_ds = Datastore.register_azure_blob_container(workspace=ws, datastore_name='blob_data', container_name='data_container',                                                 account_name='az_store_acct',                                                 account_key='123456abcde789…')
-Work with a datastore directly to upload and download data:
-blob_ds.upload(src_dir='/files', target_path='/data/files', overwrite=True, show_progress=True)
-blob_ds.download(target_path='downloads', prefix='/data', show_progress=True)
-Get datastores from your workspace
-# Get a named datastore from the current workspace
-datastore = Datastore.get(ws, datastore_name='your datastore name')
-Datasets -  Use to access data for your local or remote experiments; creates a reference to the data source location, along with a copy of its metadata
-Please see Microsoft Docs reference to Create Azure Machine Learning datasets to access data - Azure Machine Learning:  https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-register-datasets
-Also, please see Azure ML reference on Dataset class:
-https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.dataset(class)?view=azure-ml-py
-Use the Dataset object in the SDK
-from azureml.core import Dataset
-# Create and register a tabular dataset
-csv_paths = [(blob_ds, 'data/files/current_data.csv'),(blob_ds, 'data/files/archive/*.csv')]
-tab_ds = Dataset.Tabular.from_delimited_files(path=csv_paths)
-tab_ds = tab_ds.register(workspace=ws, name='csv_table')
-# Retrieve registered dataset
-csv_ds = ws.datasets['csv_table'] # Using workspace datasets attribute
-from azureml.core import Dataset
-# Create and register a file dataset
-file_ds = Dataset.File.from_files(path=(blob_ds, 'data/files/images/*.jpg'))
-file_ds = file_ds.register(workspace=ws, name='img_files')
-# Retrieve registered dataset
-img_ds = Dataset.get_by_name(ws, 'img_files') # using Dataset get_by_name method
-Reading data from a dataset
-df = tab_ds.to_pandas_dataframe()
-for file_path in file_ds.to_path():
-    print(file_path)
-Get practice using datasets with Azure ML Notebooks:  MachineLearningNotebooks/how-to-use-azureml/work-with-data at master · Azure/MachineLearningNotebooks · GitHub
-Create a new version of an existing dataset
-# add .png files to dataset definition
-img_paths = [(blob_ds, 'data/files/images/*.jpg'),(blob_ds, 'data/files/images/*.png')]
-file_ds = Dataset.File.from_files(path=img_paths)
-file_ds = file_ds.register(workspace=ws, name='img_files', create_new_version=True)
-Specify a version to retrieve
-ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
-
-# Module 05
+# Module 03
 
 ## Experiment Run Context
 *import class **Experiment** from the **Core** azureml package*
@@ -176,6 +129,56 @@ for model in Model.list(ws):
 ### Related URLs:
 
 1. [Model Class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.model.model?view=azure-ml-py)
+
+
+
+# Module 4
+Datastores – Connect to your data to Azure storage services on Azure
+Use the Datastore object in the SDK – To work with a datastore, you must first register it
+Please see Microsoft Docs reference to Connect to data in storage services on Azure - Azure Machine Learning:  https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui
+Also, see Azure ML reference on Datastore class:
+https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py
+from azureml.core import Workspace, Datastore
+ws = Workspace.from_config()
+# Register a new datastore
+blob_ds = Datastore.register_azure_blob_container(workspace=ws, datastore_name='blob_data', container_name='data_container',                                                 account_name='az_store_acct',                                                 account_key='123456abcde789…')
+Work with a datastore directly to upload and download data:
+blob_ds.upload(src_dir='/files', target_path='/data/files', overwrite=True, show_progress=True)
+blob_ds.download(target_path='downloads', prefix='/data', show_progress=True)
+Get datastores from your workspace
+# Get a named datastore from the current workspace
+datastore = Datastore.get(ws, datastore_name='your datastore name')
+Datasets -  Use to access data for your local or remote experiments; creates a reference to the data source location, along with a copy of its metadata
+Please see Microsoft Docs reference to Create Azure Machine Learning datasets to access data - Azure Machine Learning:  https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-register-datasets
+Also, please see Azure ML reference on Dataset class:
+https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.dataset(class)?view=azure-ml-py
+Use the Dataset object in the SDK
+from azureml.core import Dataset
+# Create and register a tabular dataset
+csv_paths = [(blob_ds, 'data/files/current_data.csv'),(blob_ds, 'data/files/archive/*.csv')]
+tab_ds = Dataset.Tabular.from_delimited_files(path=csv_paths)
+tab_ds = tab_ds.register(workspace=ws, name='csv_table')
+# Retrieve registered dataset
+csv_ds = ws.datasets['csv_table'] # Using workspace datasets attribute
+from azureml.core import Dataset
+# Create and register a file dataset
+file_ds = Dataset.File.from_files(path=(blob_ds, 'data/files/images/*.jpg'))
+file_ds = file_ds.register(workspace=ws, name='img_files')
+# Retrieve registered dataset
+img_ds = Dataset.get_by_name(ws, 'img_files') # using Dataset get_by_name method
+Reading data from a dataset
+df = tab_ds.to_pandas_dataframe()
+for file_path in file_ds.to_path():
+    print(file_path)
+Get practice using datasets with Azure ML Notebooks:  MachineLearningNotebooks/how-to-use-azureml/work-with-data at master · Azure/MachineLearningNotebooks · GitHub
+Create a new version of an existing dataset
+# add .png files to dataset definition
+img_paths = [(blob_ds, 'data/files/images/*.jpg'),(blob_ds, 'data/files/images/*.png')]
+file_ds = Dataset.File.from_files(path=img_paths)
+file_ds = file_ds.register(workspace=ws, name='img_files', create_new_version=True)
+Specify a version to retrieve
+ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
+
 
 
 
