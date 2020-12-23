@@ -259,95 +259,111 @@ Script_config = ScriptRunConfig(source_directory='experiment_folder',
 2. [ScriptRunConfig](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.scriptrunconfig?view=azure-ml-py)
 3. [ComputeTarget class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py)
 
-Module 6
-Pipelines – Build, optimize, and manage Azure ML workflows
-Please see Microsoft Docs reference to What are Azure Machine Learning Pipelines - Azure Machine Learning:  https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines
-Azure ML Notebooks on GitHub: MachineLearningNotebooks/how-to-use-azureml/machine-learning-pipelines at master · Azure/MachineLearningNotebooks · GitHub
-Pipeline steps class – These are pre-built steps for common scenarios in ML workflows:
-azureml.pipeline.steps package - Azure Machine Learning Python | Microsoft Docs
-step1 = PythonScriptStep(name='prepare data', ...)
-step2 = DatabricksStep(name='add notebook', ...)
-Pipeline class – Pipelines connect the listed steps together:
-https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline.pipeline?view=azure-ml-py
-training_pipeline = Pipeline(workspace=ws, steps=[step1,step2])	
-Pipeline data class – Send data along the pipeline using the output of one step as the input for the next:
-azureml.pipeline.core.module module - Azure Machine Learning Python | Microsoft Docs
- # as_dataset is called here and is passed to both the output and input of the next step.
-pipeline_data = PipelineData('output').as_dataset()
-step1 = PythonScriptStep(..., outputs=[pipeline_data])
-step2 = PythonScriptStep(..., inputs=[pipeline_data])
-Pipeline Step Reuse - Reuse output without re-running the step
-step1 = PythonScriptStep(name='prepare data', arguments = ['--folder', prepped], outputs=[prepped], allow_reuse=True, ...)
-Force all steps to re-run
-pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True)
+# Module 6
 
-Pipeline Endpoints
-PipelineEndpoint class – Represents a Pipeline workflow that can be triggered from a unique endpoint URL:
-https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py
-•	Publish a pipeline to create a REST endpoint
-published_pipeline = pipeline_run.publish(name='training_pipeline', description='Model training pipeline',version='1.0')
-•	Post a JSON request to initiate a pipeline
-o	Requires an authorization header
-o	Returns a run ID
-import requests
-response = requests.post(rest_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline"})
-run_id = response.json()["Id"]
+*Pipelines – Build, optimize, and manage Azure ML workflows* 
 
-Pipeline Parameters
-PipelineParameter class – Defines a parameter in a pipeline execution:
-https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py
-Parameterize a pipeline before publishing
-reg_param = PipelineParameter(name='reg_rate', default_value=0.01)
-...
-step2 = EstimatorStep(name='train model', estimator_entry_script_arguments=['—reg', reg_param], ...)
-...
-published_pipeline = pipeline_run.publish(name='model training pipeline', description='trains a model with reg parameter', version='2.0')
-Pass parameters in the JSON request
-response = requests.post(rest_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline",
-"ParameterAssignments": {"reg_rate": 0.1}})
-Scheduling Pipelines
-Schedule class – Defines a schedule on which to submit a pipeline.:
-https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.schedule(class)?view=azure-ml-py
-•	Schedule pipeline runs based on time
-daily = ScheduleRecurrence(frequency='Day', interval=1)
-pipeline_schedule = Schedule.create(ws, name='Daily Training', description='trains model every day',                                 pipeline_id=published_pipeline_id,  experiment_name='Training_Pipeline', recurrence=daily)
-•	Trigger pipeline runs when data changes
-training_datastore = Datastore(workspace=ws, name='blob_data')
-pipeline_schedule = Schedule.create(ws, name='Reactive Training', description='trains model on data change', pipeline_id=published_pipeline_id,    experiment_name='Training_Pipeline',   datastore=training_datastore,          path_on_datastore='data/training')
-Module 7
-Real-time Inferencing
-Batch Inferencing
-Deploying a Real-Time Inferencing Service
-See resources available on Microsoft Learn – 
-Deploy real-time machine learning services with Azure Machine Learning:
-https://docs.microsoft.com/en-us/learn/modules/register-and-deploy-model-with-amls/ 
-Microsoft Docs – 
-Tutorial: Deploy ML models with the designer - Azure Machine Learning | Microsoft Docs:
-https://docs.microsoft.com/en-us/azure/machine-learning/tutorial-designer-automobile-price-deploy 
-Model.deploy documentation-
-https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.model(class)?view=azure-ml-py#deploy-workspace--name--models--inference-config-none--deployment-config-none--deployment-target-none--overwrite-false-
-from azureml.core.model import Model
-service = Model.deploy(workspace=ws,
-                       name = 'classifier-service',
-                       models = [classification_model],
-                       inference_config = classifier_inference_config,
-                       deployment_config = classifier_deploy_config,
-                       deployment_target = production_cluster)
-service.wait_for_deployment(show_output = True)
+*Please see Microsoft Docs reference to What are Azure Machine Learning Pipelines:* 
+1. [Azure Machine Learning](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines)
+2. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
+3. *Pre-built steps for common scenarios in ML workflows:* [Pipeline steps class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-steps/azureml.pipeline.steps?view=azure-ml-py)
 
-Consuming a Real-time Inferencing Service
-Use the SDK
-import json
-x_new = [[0.1,2.3,4.1,2.0],[0.2,1.8,3.9,2.1]] # Array of feature vectors
-json_data = json.dumps({"data": x_new})
-response = service.run(input_data = json_data)
-predictions = json.loads(response)
-Use the REST Endpoint
-import json
-import requests
-x_new = [[0.1,2.3,4.1,2.0],[0.2,1.8,3.9,2.1]] # Array of feature vectors
-json_data = json.dumps({"data": x_new})
-request_headers = { 'Content-Type':'application/json' }
-response = requests.post(url=endpoint, data=json_data, headers=request_headers)
-predictions = json.loads(response.json())
-Batch Inferencing Pipeline
+```python
+step1 = PythonScriptStep(name='prepare data', ...) 
+
+step2 = DatabricksStep(name='add notebook', ...) 
+```
+
+Pipeline class – Pipelines connect the listed steps together: [Pipeline](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline.pipeline?view=azure-ml-py)
+
+```python
+training_pipeline = Pipeline(workspace=ws, steps=[step1,step2]
+```
+
+*Pipeline data class – Send data along the pipeline using the output of one step as the input for the next:* [Pipeline Data class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipelinedata?view=azure-ml-py)
+
+```python
+#as_dataset is called here and is passed to both the output and input of the next step. 
+
+pipeline_data = PipelineData('output').as_dataset() 
+
+step1 = PythonScriptStep(..., outputs=[pipeline_data]) 
+
+step2 = PythonScriptStep(..., inputs=[pipeline_data]) 
+```
+
+## Pipeline Step Reuse
+*Reuse output without re-running the step*
+
+```python
+step1 = PythonScriptStep(name='prepare data', arguments = ['--folder', prepped], outputs=[prepped], allow_reuse=True, ...) 
+```
+
+## Force all steps to re-run 
+
+```python
+pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True) 
+```
+ 
+## Pipeline Endpoints 
+
+*PipelineEndpoint class – Represents a Pipeline workflow that can be triggered from a unique endpoint URL:* [PipelineEndpoint class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py)
+
+## Publish a pipeline to create a REST endpoint 
+
+```python
+published_pipeline = pipeline_run.publish(name='training_pipeline', description='Model training pipeline',version='1.0') 
+```
+
+*Post a JSON request to initiate a pipeline requires an authorization header and returns a run ID*
+
+```python
+import requests 
+
+response = requests.post(rest_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline"}) 
+
+run_id = response.json()["Id"] 
+```
+
+## Pipeline Parameters 
+
+*PipelineParameter class – Defines a parameter in a pipeline execution:* [PipelineParameter class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py)
+
+## Parameterize a pipeline before publishing 
+
+```python
+reg_param = PipelineParameter(name='reg_rate', default_value=0.01) 
+... 
+step2 = EstimatorStep(name='train model', estimator_entry_script_arguments=['—reg', reg_param], ...) 
+... 
+published_pipeline = pipeline_run.publish(name='model training pipeline', description='trains a model with reg parameter', version='2.0') 
+```
+
+## Pass parameters in the JSON request 
+
+```python
+response = requests.post(r
+est_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline", 
+
+"ParameterAssignments": {"reg_rate": 0.1}}) 
+```
+
+## Scheduling Pipelines 
+
+*Schedule class – Defines a schedule on which to submit a pipeline:* [Schedule class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.schedule(class)?view=azure-ml-py)
+
+```python
+# schedule pipeline runs based on time 
+
+daily = ScheduleRecurrence(frequency='Day', interval=1) 
+
+pipeline_schedule = Schedule.create(ws, name='Daily Training', description='trains model every day',                                 pipeline_id=published_pipeline_id, experiment_name='Training_Pipeline', recurrence=daily) 
+
+
+# Trigger pipeline runs when data changes 
+
+training_datastore = Datastore(workspace=ws, name='blob_data') 
+
+pipeline_schedule = Schedule.create(ws, name='Reactive Training',  
+                        description='trains model on data change', pipeline_id=published_pipeline_id,    experiment_name='Training_Pipeline', datastore=training_datastore, path_on_datastore='data/training') 
+```
