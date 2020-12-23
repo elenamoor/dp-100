@@ -130,12 +130,13 @@ for model in Model.list(ws):
 
 1. [Model Class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.model.model?view=azure-ml-py)
 
-
-
 # Module 4 - Datastores, Datasets
-## Datastores – Connect to your data to Azure storage services on Azure
+## Datastores
+*Datastores allow you to connect to your data on Azure storage services*
 
-### Use the Datastore object in the SDK – To work with a datastore, you must first register it
+### To use a Datastore object, you must first register it
+*Import the Datastore class and use one of the many register methods*
+
 ```python
 from azureml.core import Workspace, Datastore
 ws = Workspace.from_config()
@@ -153,13 +154,14 @@ blob_ds.download(target_path='downloads', prefix='/data', show_progress=True)
 datastore = Datastore.get(ws, datastore_name='your datastore name')
 ```
 ### Related URLs:
-[1. Connect to data in storage services on Azure - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui)
-[2. Azure ML reference on Datastore class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)
+1. [Connect to data in storage services on Azure - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui)
+2. [Azure ML reference on Datastore class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)
 
 ## Datasets
-*Use to access data for your local or remote experiments; creates a reference to the data source location, along with a copy of its metadata*
+*Use datasets to access data for your local or remote experiments. Creating a dataset creates a reference to the data source location, along with a copy of its metadata*
 
-### Use the Dataset object in the SDK
+### Create and register a tabular Dataset object
+*Be sure to import the Dataset class first.
 ```python
 from azureml.core import Dataset
 # Create and register a tabular dataset
@@ -193,7 +195,7 @@ for file_path in file_ds.to_path():
 img_paths = [(blob_ds, 'data/files/images/*.jpg'),(blob_ds, 'data/files/images/*.png')]
 file_ds = Dataset.File.from_files(path=img_paths)
 file_ds = file_ds.register(workspace=ws, name='img_files', create_new_version=True)
-Specify a version to retrieve
+# Specify a version to retrieve
 ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
 ```
 ### Related URLs:
