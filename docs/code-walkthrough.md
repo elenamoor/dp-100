@@ -135,14 +135,14 @@ for model in Model.list(ws):
 *Datastores enable you to connect to your data on Azure storage services*
 
 ### To use a Datastore object, you must first register it
-*Import the Datastore class and use one of the many register methods*
+*Import the Datastore class, and use one of the many register methods*
 ```python
 from azureml.core import Workspace, Datastore
 ws = Workspace.from_config()
 # Register a new datastore
 blob_ds = Datastore.register_azure_blob_container(workspace=ws, datastore_name='blob_data', container_name='data_container',                                                 account_name='az_store_acct', account_key='123456abcde789…')
 ```
-### Work with a datastore directly to upload and download data:
+### Work with a datastore directly to upload and download data
 ```python
 blob_ds.upload(src_dir='/files', target_path='/data/files', overwrite=True, show_progress=True)
 blob_ds.download(target_path='downloads', prefix='/data', show_progress=True)
@@ -160,29 +160,31 @@ datastore = Datastore.get(ws, datastore_name='your datastore name')
 *Use datasets to access data for your local or remote experiments. Creating a dataset creates a reference to the data source location, along with a copy of its metadata*
 
 ### Create and register a tabular Dataset object
-*Be sure to import the Dataset class first.
+*Be sure to import the Dataset class first.*
 ```python
 from azureml.core import Dataset
-# Create and register a tabular dataset
 csv_paths = [(blob_ds, 'data/files/current_data.csv'),(blob_ds, 'data/files/archive/*.csv')]
 tab_ds = Dataset.Tabular.from_delimited_files(path=csv_paths)
 tab_ds = tab_ds.register(workspace=ws, name='csv_table')
 ```
 ### Retrieve registered dataset
 ```python
-csv_ds = ws.datasets['csv_table'] # Using workspace datasets attribute
 from azureml.core import Dataset
+csv_ds = ws.datasets['csv_table'] # Using workspace datasets attribute
 ```
 ### Create and register a file dataset
 ```python
+from azureml.core import Dataset
 file_ds = Dataset.File.from_files(path=(blob_ds, 'data/files/images/*.jpg'))
 file_ds = file_ds.register(workspace=ws, name='img_files')
+img_ds = Dataset.get_by_name(ws, 'img_files') # using Dataset get_by_name method
 ```
 ### Retrieve registered dataset
 ```python
+from azureml.core import Dataset
 img_ds = Dataset.get_by_name(ws, 'img_files') # using Dataset get_by_name method
 ```
-### Read data from a dataset
+### Read data from a tabular dataset
 ```python
 df = tab_ds.to_pandas_dataframe()
 for file_path in file_ds.to_path():
@@ -194,7 +196,9 @@ for file_path in file_ds.to_path():
 img_paths = [(blob_ds, 'data/files/images/*.jpg'),(blob_ds, 'data/files/images/*.png')]
 file_ds = Dataset.File.from_files(path=img_paths)
 file_ds = file_ds.register(workspace=ws, name='img_files', create_new_version=True)
+``` 
 # Specify a version to retrieve
+```python
 ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
 ```
 ### Related URLs:
@@ -296,7 +300,6 @@ training_pipeline = Pipeline(workspace=ws, steps=[step1,step2]
 ```
 ### Send data between pipeline steps by using a Pipeline Data object
 *Use the output of one step as the input for the next*
-
 ```python
 #as_dataset is called here and is passed to both the output and input of the next step. 
 from azureml.pipeline.core import PipelineData
@@ -320,15 +323,14 @@ pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True)
 4. [Azure Machine Learning Pipelines](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines)
 5. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
 
-## Pipeline Endpoints 
+## Pipeline Endpoints
+*A PipelineEndpoint object defines a pipeline workflow that can be triggered from a unique endpoint URL*
 
 ### Publish a pipeline to create a REST endpoint 
 ```python
 published_pipeline = pipeline_run.publish(name='training_pipeline', description='Model training pipeline',version='1.0') 
 ```
-
 *Post a JSON request to initiate a pipeline requires an authorization header and returns a run ID*
-
 ```python
 import requests 
 
@@ -336,13 +338,10 @@ response = requests.post(rest_endpoint, headers=auth_header, json={"ExperimentNa
 
 run_id = response.json()["Id"] 
 ```
-
 ## Pipeline Parameters 
-
-*PipelineParameter class – Defines a parameter in a pipeline execution:* [PipelineParameter class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py)
+*PipelineParameter class object defines a parameter in a pipeline execution* 
 
 ## Parameterize a pipeline before publishing 
-
 ```python
 reg_param = PipelineParameter(name='reg_rate', default_value=0.01) 
 ... 
@@ -350,7 +349,6 @@ step2 = EstimatorStep(name='train model', estimator_entry_script_arguments=['—
 ... 
 published_pipeline = pipeline_run.publish(name='model training pipeline', description='trains a model with reg parameter', version='2.0') 
 ```
-
 ## Pass parameters in the JSON request 
 
 ```python
@@ -359,26 +357,19 @@ est_endpoint, headers=auth_header, json={"ExperimentName": "run training pipelin
 
 "ParameterAssignments": {"reg_rate": 0.1}}) 
 ```
-
 ## Scheduling Pipelines 
-
 *Schedule class – Defines a schedule on which to submit a pipeline:* [Schedule class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.schedule(class)?view=azure-ml-py)
-
+### Schedule pipeline runs based on time 
 ```python
-# schedule pipeline runs based on time 
-
 daily = ScheduleRecurrence(frequency='Day', interval=1) 
-
 pipeline_schedule = Schedule.create(ws, name='Daily Training', description='trains model every day',                                 pipeline_id=published_pipeline_id, experiment_name='Training_Pipeline', recurrence=daily) 
-
-
-# Trigger pipeline runs when data changes 
-
-training_datastore = Datastore(workspace=ws, name='blob_data') 
-
-pipeline_schedule = Schedule.create(ws, name='Reactive Training',  
-                        description='trains model on data change', pipeline_id=published_pipeline_id,    experiment_name='Training_Pipeline', datastore=training_datastore, path_on_datastore='data/training') 
 ```
-
-*Please see Microsoft Docs reference to What are Azure Machine Learning Pipelines:* 
-*PipelineEndpoint class – Represents a Pipeline workflow that can be triggered from a unique endpoint URL:* [PipelineEndpoint class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py)
+### Trigger pipeline runs when data changes 
+```python
+training_datastore = Datastore(workspace=ws, name='blob_data') 
+pipeline_schedule = Schedule.create(ws, name='Reactive Training', description='trains model on data change', pipeline_id=published_pipeline_id,experiment_name='Training_Pipeline', datastore=training_datastore, path_on_datastore='data/training') 
+```
+### Related URLs
+1. [What are Azure Machine Learning Pipelines](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines#:~:text=An%20Azure%20Machine%20Learning%20pipeline%20is%20an%20independently,Python%20script%2C%20so%20may%20do%20just%20about%20anything.)
+2. [PipelineEndpoint class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py)
+3. [PipelineParameter class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py)
