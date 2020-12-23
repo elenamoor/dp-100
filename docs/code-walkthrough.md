@@ -132,16 +132,15 @@ for model in Model.list(ws):
 
 # Module 4 - Datastores, Datasets
 ## Datastores
-*Datastores allow you to connect to your data on Azure storage services*
+*Datastores enable you to connect to your data on Azure storage services*
 
 ### To use a Datastore object, you must first register it
 *Import the Datastore class and use one of the many register methods*
-
 ```python
 from azureml.core import Workspace, Datastore
 ws = Workspace.from_config()
 # Register a new datastore
-blob_ds = Datastore.register_azure_blob_container(workspace=ws, datastore_name='blob_data', container_name='data_container',                                                 account_name='az_store_acct',                                                 account_key='123456abcde789…')
+blob_ds = Datastore.register_azure_blob_container(workspace=ws, datastore_name='blob_data', container_name='data_container',                                                 account_name='az_store_acct', account_key='123456abcde789…')
 ```
 ### Work with a datastore directly to upload and download data:
 ```python
@@ -154,8 +153,8 @@ blob_ds.download(target_path='downloads', prefix='/data', show_progress=True)
 datastore = Datastore.get(ws, datastore_name='your datastore name')
 ```
 ### Related URLs:
-1. [Connect to data in storage services on Azure - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui)
-2. [Azure ML reference on Datastore class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)
+1. [Connect to data in storage services on Azure](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui)
+2. [Datastore class documentation](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)
 
 ## Datasets
 *Use datasets to access data for your local or remote experiments. Creating a dataset creates a reference to the data source location, along with a copy of its metadata*
@@ -199,9 +198,9 @@ file_ds = file_ds.register(workspace=ws, name='img_files', create_new_version=Tr
 ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
 ```
 ### Related URLs:
-1. [Create Azure Machine Learning datasets to access data - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-register-datasets)
-2. [Azure ML reference on Dataset class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.dataset(class)?view=azure-ml-py)
-3. [Get practice using datasets with Azure ML Notebooks:  ](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/work-with-data/)
+1. [Create Azure Machine Learning datasets to access data](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-register-datasets)
+2. [Dataset class documentation](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.dataset(class)?view=azure-ml-py)
+3. [Practice using datasets with Azure ML Notebooks](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/work-with-data/)
 
 # Module 05 - Environments, Compute Targets
 
@@ -282,7 +281,7 @@ Script_config = ScriptRunConfig(source_directory='experiment_folder',
 
 # Module 6 - Pipelines, Publishing and Running Pipelines
 ## Pipelines
-*Build, optimize, and manage Azure ML workflows* 
+*Build, optimize, and manage Azure ML workflows with Pipelines. Pipelines connect listed steps together.*
 
 ### Pipelines are built from pre-configured pipeline steps that cover many common scenarios
 ```python
@@ -296,6 +295,8 @@ from azureml.pipeline.core import Pipeline
 training_pipeline = Pipeline(workspace=ws, steps=[step1,step2]
 ```
 ### Send data between pipeline steps by using a Pipeline Data object
+*Use the output of one step as the input for the next*
+
 ```python
 #as_dataset is called here and is passed to both the output and input of the next step. 
 from azureml.pipeline.core import PipelineData
@@ -313,9 +314,9 @@ step1 = PythonScriptStep(name='prepare data', arguments = ['--folder', prepped],
 pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True) 
 ```
 ### Related URLs
-1. [Pipeline class – Pipelines connect listed steps together: ](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline.pipeline)
-2. [Pipeline steps class - Pre-built steps for common scenarios in ML workflows:  ](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-steps/azureml.pipeline.steps?view=azure-ml-py)
-3. [Pipeline data class – Send data along the pipeline using the output of one step as the input for the next:  ](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipelinedata?view=azure-ml-py)
+1. [Pipeline class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline.pipeline)
+2. [Pipeline steps class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-steps/azureml.pipeline.steps?view=azure-ml-py)
+3. [Pipeline data class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipelinedata?view=azure-ml-py)
 4. [Azure Machine Learning Pipelines](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines)
 5. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
 
