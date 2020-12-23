@@ -156,34 +156,38 @@ datastore = Datastore.get(ws, datastore_name='your datastore name')
 [1. Connect to data in storage services on Azure - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-connect-data-ui)
 [2. Azure ML reference on Datastore class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)
 
-## Datasets -  Use to access data for your local or remote experiments; creates a reference to the data source location, along with a copy of its metadata
-### Use the Dataset object in the SDK
+## Datasets
+*Use to access data for your local or remote experiments; creates a reference to the data source location, along with a copy of its metadata*
 
+### Use the Dataset object in the SDK
 ```python
 from azureml.core import Dataset
 # Create and register a tabular dataset
 csv_paths = [(blob_ds, 'data/files/current_data.csv'),(blob_ds, 'data/files/archive/*.csv')]
 tab_ds = Dataset.Tabular.from_delimited_files(path=csv_paths)
 tab_ds = tab_ds.register(workspace=ws, name='csv_table')
-
-# Retrieve registered dataset
+```
+### Retrieve registered dataset
+```python
 csv_ds = ws.datasets['csv_table'] # Using workspace datasets attribute
 from azureml.core import Dataset
-
-# Create and register a file dataset
+```
+### Create and register a file dataset
+```python
 file_ds = Dataset.File.from_files(path=(blob_ds, 'data/files/images/*.jpg'))
 file_ds = file_ds.register(workspace=ws, name='img_files')
-
-# Retrieve registered dataset
+```
+### Retrieve registered dataset
+```python
 img_ds = Dataset.get_by_name(ws, 'img_files') # using Dataset get_by_name method
-
-# Read data from a dataset
+```
+### Read data from a dataset
+```python
 df = tab_ds.to_pandas_dataframe()
 for file_path in file_ds.to_path():
     print(file_path)
-```
-    
-## Create a new version of an existing dataset
+``` 
+### Create a new version of an existing dataset
 ```python
 # add .png files to dataset definition
 img_paths = [(blob_ds, 'data/files/images/*.jpg'),(blob_ds, 'data/files/images/*.png')]
@@ -193,9 +197,9 @@ Specify a version to retrieve
 ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
 ```
 ### Related URLs:
-[1. Create Azure Machine Learning datasets to access data - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-register-datasets)
-[2. Azure ML reference on Dataset class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.dataset(class)?view=azure-ml-py)
-[3. Get practice using datasets with Azure ML Notebooks:  ](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/work-with-data/)
+1. [Create Azure Machine Learning datasets to access data - Azure Machine Learning:  ](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-register-datasets)
+2. [Azure ML reference on Dataset class:  ](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.dataset(class)?view=azure-ml-py)
+3. [Get practice using datasets with Azure ML Notebooks:  ](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/work-with-data/)
 
 # Module 05 - Environments, Compute Targets
 
