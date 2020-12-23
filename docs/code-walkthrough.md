@@ -281,57 +281,47 @@ Script_config = ScriptRunConfig(source_directory='experiment_folder',
 3. [ComputeTarget class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.computetarget?view=azure-ml-py)
 
 # Module 6 - Pipelines, Publishing and Running Pipelines
+## Pipelines
+*Build, optimize, and manage Azure ML workflows* 
 
-*Pipelines – Build, optimize, and manage Azure ML workflows* 
-
-*Please see Microsoft Docs reference to What are Azure Machine Learning Pipelines:* 
-1. [Azure Machine Learning](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines)
-2. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
-3. *Pre-built steps for common scenarios in ML workflows:* [Pipeline steps class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-steps/azureml.pipeline.steps?view=azure-ml-py)
-
+### Pipelines are built from pre-configured pipeline steps that cover many common scenarios
 ```python
+from azureml.pipeline.core import Pipeline
 step1 = PythonScriptStep(name='prepare data', ...) 
-
 step2 = DatabricksStep(name='add notebook', ...) 
 ```
-
-Pipeline class – Pipelines connect the listed steps together: [Pipeline](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline.pipeline?view=azure-ml-py)
-
+### Create a Pipeline object, constructor requires a workspace and a set of steps as arguments
 ```python
+from azureml.pipeline.core import Pipeline
 training_pipeline = Pipeline(workspace=ws, steps=[step1,step2]
 ```
-
-*Pipeline data class – Send data along the pipeline using the output of one step as the input for the next:* [Pipeline Data class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipelinedata?view=azure-ml-py)
-
+### Send data between pipeline steps by using a Pipeline Data object
 ```python
 #as_dataset is called here and is passed to both the output and input of the next step. 
-
+from azureml.pipeline.core import PipelineData
 pipeline_data = PipelineData('output').as_dataset() 
-
 step1 = PythonScriptStep(..., outputs=[pipeline_data]) 
-
 step2 = PythonScriptStep(..., inputs=[pipeline_data]) 
 ```
-
-## Pipeline Step Reuse
-*Reuse output without re-running the step*
-
+### Pipeline Step Reuse
+*Save time by reusing output without re-running the step*
 ```python
 step1 = PythonScriptStep(name='prepare data', arguments = ['--folder', prepped], outputs=[prepped], allow_reuse=True, ...) 
 ```
-
-## Force all steps to re-run 
-
+### Force all steps to re-run to ensure that you are always using the freshest data
 ```python
 pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True) 
 ```
- 
+### Related URLs
+1. [Pipeline class – Pipelines connect listed steps together: ](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline.pipeline)
+2. [Pipeline steps class - Pre-built steps for common scenarios in ML workflows:  ](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-steps/azureml.pipeline.steps?view=azure-ml-py)
+3. [Pipeline data class – Send data along the pipeline using the output of one step as the input for the next:  ](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipelinedata?view=azure-ml-py)
+4. [Azure Machine Learning Pipelines](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines)
+5. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
+
 ## Pipeline Endpoints 
 
-*PipelineEndpoint class – Represents a Pipeline workflow that can be triggered from a unique endpoint URL:* [PipelineEndpoint class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py)
-
-## Publish a pipeline to create a REST endpoint 
-
+### Publish a pipeline to create a REST endpoint 
 ```python
 published_pipeline = pipeline_run.publish(name='training_pipeline', description='Model training pipeline',version='1.0') 
 ```
@@ -388,3 +378,6 @@ training_datastore = Datastore(workspace=ws, name='blob_data')
 pipeline_schedule = Schedule.create(ws, name='Reactive Training',  
                         description='trains model on data change', pipeline_id=published_pipeline_id,    experiment_name='Training_Pipeline', datastore=training_datastore, path_on_datastore='data/training') 
 ```
+
+*Please see Microsoft Docs reference to What are Azure Machine Learning Pipelines:* 
+*PipelineEndpoint class – Represents a Pipeline workflow that can be triggered from a unique endpoint URL:* [PipelineEndpoint class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py)
