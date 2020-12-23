@@ -197,7 +197,7 @@ img_paths = [(blob_ds, 'data/files/images/*.jpg'),(blob_ds, 'data/files/images/*
 file_ds = Dataset.File.from_files(path=img_paths)
 file_ds = file_ds.register(workspace=ws, name='img_files', create_new_version=True)
 ``` 
-# Specify a version to retrieve
+### Specify a version to retrieve
 ```python
 ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
 ```
