@@ -324,14 +324,14 @@ pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True)
 5. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
 
 ## Pipeline Endpoints
-*A PipelineEndpoint object defines a pipeline workflow that can be triggered from a unique endpoint URL.*
+*A **PipelineEndpoint** object defines a pipeline workflow that can be triggered from a unique endpoint URL.*
 
 ### Publish a pipeline to create a REST endpoint 
 ```python
 published_pipeline = pipeline_run.publish(name='training_pipeline', description='Model training pipeline',version='1.0') 
 ```
 ### Post a JSON request to initiate a pipeline
-*It requires an authorization header and returns a run ID.*
+*A JSON request requires an authorization header and returns a run ID.*
 ```python
 import requests 
 response = requests.post(rest_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline"}) 
