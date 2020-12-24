@@ -132,10 +132,10 @@ for model in Model.list(ws):
 
 # Module 4 - Datastores, Datasets
 ## Datastores
-*Datastores enable you to connect to your data on Azure storage services*
+***Datastores** enable you to connect to your data on Azure storage services.*
 
-### To use a Datastore object, you must first register it
-*Import the Datastore class, and use one of the many register methods*
+### To use a **Datastore** object, you must first register it
+*Import the **Datastore** class, and use one of the many register methods.*
 ```python
 from azureml.core import Workspace, Datastore
 ws = Workspace.from_config()
@@ -157,7 +157,7 @@ datastore = Datastore.get(ws, datastore_name='your datastore name')
 2. [Datastore class documentation](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.datastore.datastore?view=azure-ml-py)
 
 ## Datasets
-*Use datasets to access data for your local or remote experiments. Creating a dataset creates a reference to the data source location, along with a copy of its metadata*
+*Use **datasets** to access data for your local or remote experiments. Creating a **dataset** creates a reference to the data source location, along with a copy of its metadata.*
 
 ### Create and register a tabular Dataset object
 *Be sure to import the Dataset class first.*
@@ -208,7 +208,7 @@ ds = Dataset.get_by_name(workspace=ws, name='img_files', version=2)
 
 # Module 05 - Environments, Compute Targets
 
-*This module's logic is same, as Mod.3, please use this explanation as a guide for the related URLs to the class documentation*
+*This module's logic is same, as Mod.3, please use this explanation as a guide for the related URLs to the class documentation.*
 
 ## Create environment from specification file
 
@@ -285,7 +285,7 @@ Script_config = ScriptRunConfig(source_directory='experiment_folder',
 
 # Module 6 - Pipelines, Publishing and Running Pipelines
 ## Pipelines
-*Build, optimize, and manage Azure ML workflows with Pipelines. Pipelines connect listed steps together.*
+*Build, optimize, and manage Azure ML workflows with **Pipelines**. **Pipelines** connect listed steps together.*
 
 ### Pipelines are built from pre-configured pipeline steps that cover many common scenarios
 ```python
@@ -299,7 +299,7 @@ from azureml.pipeline.core import Pipeline
 training_pipeline = Pipeline(workspace=ws, steps=[step1,step2]
 ```
 ### Send data between pipeline steps by using a Pipeline Data object
-*Use the output of one step as the input for the next*
+*Use the output of one step as the input for the next.*
 ```python
 #as_dataset is called here and is passed to both the output and input of the next step. 
 from azureml.pipeline.core import PipelineData
@@ -308,7 +308,7 @@ step1 = PythonScriptStep(..., outputs=[pipeline_data])
 step2 = PythonScriptStep(..., inputs=[pipeline_data]) 
 ```
 ### Pipeline Step Reuse
-*Save time by reusing output without re-running the step*
+*Save time by reusing output without re-running the step.*
 ```python
 step1 = PythonScriptStep(name='prepare data', arguments = ['--folder', prepped], outputs=[prepped], allow_reuse=True, ...) 
 ```
@@ -324,22 +324,21 @@ pipeline_run = experiment.submit(pipeline_experiment, regenerate_outputs=True)
 5. [Azure ML Notebooks on GitHub](https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/machine-learning-pipelines) 
 
 ## Pipeline Endpoints
-*A PipelineEndpoint object defines a pipeline workflow that can be triggered from a unique endpoint URL*
+*A PipelineEndpoint object defines a pipeline workflow that can be triggered from a unique endpoint URL.*
 
 ### Publish a pipeline to create a REST endpoint 
 ```python
 published_pipeline = pipeline_run.publish(name='training_pipeline', description='Model training pipeline',version='1.0') 
 ```
-*Post a JSON request to initiate a pipeline requires an authorization header and returns a run ID*
+### Post a JSON request to initiate a pipeline
+*It requires an authorization header and returns a run ID.*
 ```python
 import requests 
-
 response = requests.post(rest_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline"}) 
-
 run_id = response.json()["Id"] 
 ```
 ## Pipeline Parameters 
-*PipelineParameter class object defines a parameter in a pipeline execution* 
+***PipelineParameter** class object defines a parameter in a pipeline execution.* 
 
 ## Parameterize a pipeline before publishing 
 ```python
@@ -350,15 +349,14 @@ step2 = EstimatorStep(name='train model', estimator_entry_script_arguments=['—
 published_pipeline = pipeline_run.publish(name='model training pipeline', description='trains a model with reg parameter', version='2.0') 
 ```
 ## Pass parameters in the JSON request 
-
 ```python
 response = requests.post(r
 est_endpoint, headers=auth_header, json={"ExperimentName": "run training pipeline", 
-
 "ParameterAssignments": {"reg_rate": 0.1}}) 
 ```
 ## Scheduling Pipelines 
-*Schedule class – Defines a schedule on which to submit a pipeline:* [Schedule class](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.schedule(class)?view=azure-ml-py)
+*A**Schedule** class object– Defines a schedule on which to submit a pipeline.
+
 ### Schedule pipeline runs based on time 
 ```python
 daily = ScheduleRecurrence(frequency='Day', interval=1) 
@@ -373,3 +371,4 @@ pipeline_schedule = Schedule.create(ws, name='Reactive Training', description='t
 1. [What are Azure Machine Learning Pipelines](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines#:~:text=An%20Azure%20Machine%20Learning%20pipeline%20is%20an%20independently,Python%20script%2C%20so%20may%20do%20just%20about%20anything.)
 2. [PipelineEndpoint class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.pipeline_endpoint.pipelineendpoint?view=azure-ml-py)
 3. [PipelineParameter class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py)
+4. [Schedule class documentation](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.schedule(class)?view=azure-ml-py)
