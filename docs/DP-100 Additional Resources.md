@@ -1,5 +1,9 @@
-# DP-100 Resources per module 
+# Microsoft Certification exam 
 
+[Exam format and questions types](https://docs.microsoft.com/en-us/learn/certifications/certification-exams#exam-formats-and-question-types)
+
+
+# DP-100 Resources per module 
 
 ## Module 01 - Getting Started with Azure Machine Learning
 
