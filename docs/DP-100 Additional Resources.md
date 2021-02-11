@@ -8,7 +8,7 @@
 ## Module 01 - Getting Started with Azure Machine Learning
 
 1.   [What is Azure Machine Learning?](https://docs.microsoft.com/en-us/azure/machine-learning/overview-what-is-azure-ml)
-2.   [How AML works: Architacture and concepts](https://docs.microsoft.com/en-us/azure/machine-learning/concept-azure-machine-learning-architecture)
+2.   [How AML works: Architecture and concepts](https://docs.microsoft.com/en-us/azure/machine-learning/concept-azure-machine-learning-architecture)
 3.   [Azure Machine Learning SDK for Python](https://docs.microsoft.com/en-us/python/api/overview/azure/ml/?view=azure-ml-py#:~:text=%20What%20is%20the%20Azure%20Machine%20Learning%20SDK,is%20another%20foundational%20cloud%20resource%20that...%20More)
 4.   [*Cognitive services](https://docs.microsoft.com/en-us/azure/cognitive-services/what-are-cognitive-services)
 5.   [Enterprise security and governance for AML](https://docs.microsoft.com/en-us/azure/machine-learning/concept-enterprise-security)
