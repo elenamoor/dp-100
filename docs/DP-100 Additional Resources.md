@@ -89,3 +89,13 @@
 1. [AML monitoring with Application Insights](https://docs.microsoft.com/azure/machine-learning/how-to-enable-app-insights)
 2. [AML data drift](https://docs.microsoft.com/azure/machine-learning/how-to-monitor-datasets)
 3. [Channel 9: Data Drift monitoring for AML datasets](https://channel9.msdn.com/Shows/AI-Show/Drift)
+
+
+## Azure SDK limits and other information
+1. [AML Python SDK](https://pypi.org/project/azureml-sdk/) 
+2. [AML Python SDK - documentation](https://docs.microsoft.com/en-us/python/api/overview/azure/ml/?view=azure-ml-py)
+
+## Related Azure resources
+1. [Azure Machine learning Pricing calculator](https://azure.microsoft.com/en-us/pricing/details/machine-learning/)
+2. [Azure Cost Management](https://docs.microsoft.com/en-us/azure/cost-management-billing/understand/download-azure-daily-usage)
+3. [Azure Databricks](https://azure.microsoft.com/en-us/services/databricks/)
